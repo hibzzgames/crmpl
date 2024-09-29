@@ -1,5 +1,5 @@
-# papr
-Papr is an open file format designed to store readable key-value pairs that can be minified.
+# crmpl
+Crmpl is an open file format designed to store readable key-value pairs that can be minified.
 
 ### Goals
 - Simple rules
@@ -8,7 +8,7 @@ Papr is an open file format designed to store readable key-value pairs that can 
 
 <br />
 
-P.S. papr stands for Primitive Array of Pair Records!
+P.S. Crmpl started as an early candidate for [papr](https://github.com/hibzzgames/papr), but the two projects diverged as papr compromised minifiability for readability. Crmpl attempts to strike a balance and that's why crmpl is named as such, like the crumpling of a paper.
 
 ---
 
@@ -28,7 +28,7 @@ P.S. papr stands for Primitive Array of Pair Records!
 ### Detailed Explanation
 **Rule 1**
 
-With papr, the key-value relationships between the various tokens in a file are defined using a concept called depth. The colon symbol, `:`, is used to increase the depth of the next token and create a child-parent relationship between the current token and the previous token.
+With crmpl, the key-value relationships between the various tokens in a file are defined using a concept called depth. The colon symbol, `:`, is used to increase the depth of the next token and create a child-parent relationship between the current token and the previous token.
 
 ```
 year: 2024
@@ -44,9 +44,9 @@ The comma symbol, `,`, keeps a series of tokens in the same depth. They create a
 
 ```
 seasons: spring,
-         summer,
-         fall,
-         winter
+ summer,
+ fall,
+ winter
 ```
 
 After creating a key-value relationship between the tokens "seasons" and "spring" using the `:` symbol, the `,` symbol after the token "spring" is used to keep the next token, "summer", in the same depth as the previous token. The series of `,` symbols chains together and keeps a set of tokens in the same depth.
@@ -71,22 +71,22 @@ Here, the `;` symbol after the token "2024" ensures that the next token, "month"
 Now, these 3 basic rules require some clarity on what is considered a token. By default, a token is a string of characters that are terminated by one of the reserved symbols (`:`, `,`, `;`, or `#`). To make the file cleaner and more readable, the leading and trailing white spaces of a character sequence string will be trimmed. Spaces in the middle will be considered to be part of the token.
 
 ```
-   licenses:  MIT,  Creative  Commons , Custom   ;
-___         __    __                 _ _      ___    <-- trimmed spaces
-   --------X  ---X  ----------------- X ------   X   <-- Xs are terminators, dashes are part of a token
-   |          |     |                   | 4: Custom
-   |          |     | 3: Creative  Commons
-   |          | 2: MIT
-   | 1: licenses
+ licenses:  MIT,  Creative  Commons, Custom   ;
+___         __    __                 _ _      ___    <-- trimmed spaces
+ --------X  ---X  ----------------- X ------   X   <-- Xs are terminators, dashes are part of a token
+ |          |     |                   | 4: Custom
+ |          |     | 3: Creative  Commons
+ |          | 2: MIT
+ | 1: licenses
 ```
 
 Additionally, to facilitate the existence of reserved symbols or leading/trailing spaces in a token, a complex token can be created using a set of double quotes to wrap the content together. Inside a double-quote wrapped complex token, a new double-quote can be included by creating an escape sequence with a backslash (`\"`).
 
 ```
-statement:  " This is a complex token with a reserved symbol like a semicolon, \";\", and leading and trailing spaces  "  ;
-          __                                                                                                            __     <-- trimmed spaces
----------x  x----------------------------------------------------------------------------------------------------------x  x    <-- Xs are terminators, dashes are part of a token
-|            | 2:  This is a complex token with a reserved symbol like a semicolon, ";", and leading and trailing spaces       <-- has 1 leading and 2 trailing spaces
+statement:  " This is a complex token with a reserved symbol like a semicolon, \";\", and leading and trailing spaces  "  ;
+ __                                                                                                            __     <-- trimmed spaces
+---------x  x----------------------------------------------------------------------------------------------------------x  x    <-- Xs are terminators, dashes are part of a token
+|            | 2:  This is a complex token with a reserved symbol like a semicolon, ";", and leading and trailing spaces       <-- has 1 leading and 2 trailing spaces
 | 1: statement
 ```
 
@@ -103,30 +103,30 @@ versions: 10, 11;
 compiler: msvc; # explore replacing with g++ 
 ```
 
-A single-line comment cannot exist in a minified papr file. So, papr introduces the double hashtag sequence (`##`) to define the start and the end of a multiline comment. Honestly, these comments can be removed from a minified file, but just in case, from a usability perspective, we want to support it for the users.
+A single-line comment cannot exist in a minified crmpl file. So, crmpl introduces the double hashtag sequence (`##`) to define the start and the end of a multiline comment. Honestly, these comments can be removed from a minified file, but just in case, from a usability perspective, we want to support it for the users.
 
 ```
-format: papr;
+format: crmpl;
 parser: c++ ## WIP ##, c#, js, rust;
 ```
 
 <br />
 
-These are all the rules required to create and define data in your very own papr file. Here's a final sample of a somewhat complicated papr file.
+These are all the rules required to create and define data in your very own crmpl file. Here's a final sample of a somewhat complicated crmpl file.
 
 ```
-# an example .papr file
+# an example .crmpl file
 AppName: Some App;
 Authors: Jane,
-         John;
+ John;
 Buttons: 0: id: new;
-            fn: newDoc();
-            icon: plus;;
-         1: id: missing;
-            icon: alarm;; ## issue: fix this ##
-         2: id: edit;
-            fn: editDoc();
-            icon: pencil;;;
+ fn: newDoc();
+ icon: plus;;
+ 1: id: missing;
+ icon: alarm;; ## issue: fix this ##
+ 2: id: edit;
+ fn: editDoc();
+ icon: pencil;;;
 Description: "This is a random description for \"Some App\".";
 Version: 1.3.7;
 ```
@@ -140,5 +140,4 @@ This repository also contains parsers to encode and decode .papr files for popul
 #### Planned Languages:
 - c/c++
 - c#
-- rust
 - js
